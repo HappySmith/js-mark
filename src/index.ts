@@ -4,9 +4,9 @@ import config from "./lib/config.js";
 class JsMark {
     private _element: Element;
     private _selection: Nullable<Selection>;
-    private _onMouseUp:Nullable<Listener>;
+    private _onMouseUp: Nullable<Listener>;
     private _onClick: Nullable<Function>;
-    private _onSelected:Nullable<Function>;
+    private _onSelected: Nullable<Function>;
 
     public onSelected: Nullable<Function>;
     public onClick: Nullable<Function>;
@@ -15,15 +15,15 @@ class JsMark {
         this._element = ops.el;
         this._selection = window.getSelection();
 
-        if(this._element.nodeType!==1){
-             throw new Error("请挂载dom节点");
+        if (this._element.nodeType !== 1) {
+            throw new Error("请挂载dom节点");
         }
-        if(!this._selection){
+        if (!this._selection) {
             throw new Error("浏览器暂不支持标注，请查看文档支持浏览器版本");
         }
-      
-        config.isCover =  ops?.options?.isCover ?? config.isCover
-        
+
+        config.isCover = ops?.options?.isCover ?? config.isCover
+
         this._onMouseUp = null;
         this._onClick = null;
         this._onSelected = null;
@@ -33,7 +33,7 @@ class JsMark {
         this._initEvent();
         this._addEvent();
     }
-     
+
     private _initEvent() {
         let that = this;
 
@@ -51,11 +51,11 @@ class JsMark {
         };
 
         that._onSelected = function (e: Selected | string) {
-                if(typeof e === "string"){
-                    throw new Error(e)
-                }else{
-                    this.onSelected &&this.onSelected(e);
-                }
+            if (typeof e === "string") {
+                throw new Error(e)
+            } else {
+                this.onSelected && this.onSelected(e);
+            }
         };
     }
 
@@ -92,8 +92,8 @@ class JsMark {
         });
     }
 
-    findWord(word:string):Nullable<SelectBase[]>{
-        if(!word) return null;
+    findWord(word: string): Nullable<SelectBase[]> {
+        if (!word) return null;
         return Util.relativeOffsetChat(word, this._element)
     }
 
@@ -115,9 +115,9 @@ class JsMark {
 
         if (
             !config.isCover &&
-                ((r.startContainer.parentNode as HTMLTextAreaElement).dataset
-                    .selector ||
-            (r.endContainer.parentNode as HTMLTextAreaElement).dataset.selector)
+            ((r.startContainer.parentNode as HTMLTextAreaElement).dataset
+                .selector ||
+                (r.endContainer.parentNode as HTMLTextAreaElement).dataset.selector)
         ) {
             selection.removeAllRanges();
             return this._onSelected && this._onSelected("不允许覆盖标注，详细请看配置文档，或设置isCover为true");
@@ -128,7 +128,7 @@ class JsMark {
             let endContainer = r.endContainer.splitText(r.endOffset);
             r.endContainer = endContainer.previousSibling as Text;
             r.startContainer = r.startContainer.splitText(r.startOffset);
-        }  else {
+        } else {
             let endContainer = r.endContainer.splitText(r.endOffset);
             r.startContainer = r.startContainer.splitText(r.startOffset);
             r.endContainer = endContainer.previousSibling as Text;
@@ -165,27 +165,38 @@ class JsMark {
         return rangeText;
     }
 
-    repaintRange(rangeNode:RangeNodes) {
-
-        let {uuid,className,textNodes} = rangeNode;
+    repaintRange(rangeNode: RangeNodes) {
+        let { uuid, className, textNodes, attrs } = rangeNode;
         let uid = uuid || Util.Guid()
-        textNodes.forEach((node) => {
+        const len = textNodes.length
+        textNodes.forEach((node, index) => {
             if (node.parentNode) {
                 let hl = document.createElement("span");
-                if(className){
+                if (className) {
                     hl.className = className;
-                }else{
+                } else {
                     hl.style.background = "rgba(255, 255, 0, 0.3)"
                 }
-               
                 hl.setAttribute("data-selector", uid);
+                hl.setAttribute("data-index", `${index}`)
+                if (index === 0) {
+                    hl.setAttribute("data-start", '')
+                }
+                if (index === len - 1) {
+                    hl.setAttribute("data-end", '')
+                }
+                if (attrs) {
+                    attrs.forEach(attr => {
+                        hl.setAttribute(attr.name, attr.value)
+                    })
+                }
                 node.parentNode.replaceChild(hl, node);
                 hl.appendChild(node);
             }
         });
         return uuid;
     }
-    
+
     clearMark(uuid: Number): void {
         let eleArr = document.querySelectorAll(`span[data-selector="${uuid}"]`);
         eleArr.forEach((node) => {
@@ -199,6 +210,7 @@ class JsMark {
                 node.parentNode.replaceChild(fragment, node);
             }
         });
+        this._element.normalize()
     }
 }
 export default JsMark;

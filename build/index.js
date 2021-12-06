@@ -136,9 +136,10 @@ class JsMark {
         return rangeText;
     }
     repaintRange(rangeNode) {
-        let { uuid, className, textNodes } = rangeNode;
+        let { uuid, className, textNodes, attrs } = rangeNode;
         let uid = uuid || Util.Guid();
-        textNodes.forEach((node) => {
+        const len = textNodes.length;
+        textNodes.forEach((node, index) => {
             if (node.parentNode) {
                 let hl = document.createElement("span");
                 if (className) {
@@ -148,6 +149,18 @@ class JsMark {
                     hl.style.background = "rgba(255, 255, 0, 0.3)";
                 }
                 hl.setAttribute("data-selector", uid);
+                hl.setAttribute("data-index", `${index}`);
+                if (index === 0) {
+                    hl.setAttribute("data-start", '');
+                }
+                if (index === len - 1) {
+                    hl.setAttribute("data-end", '');
+                }
+                if (attrs) {
+                    attrs.forEach(attr => {
+                        hl.setAttribute(attr.name, attr.value);
+                    });
+                }
                 node.parentNode.replaceChild(hl, node);
                 hl.appendChild(node);
             }
@@ -167,6 +180,7 @@ class JsMark {
                 node.parentNode.replaceChild(fragment, node);
             }
         });
+        this._element.normalize();
     }
 }
 export default JsMark;

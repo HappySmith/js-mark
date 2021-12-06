@@ -22,7 +22,7 @@ export function getTextNodes(ele: Element | Node): Text[] {
   return nodes;
 }
 /** 获取字符相对于root元素的偏移量*/
-export function relativeOffsetChat(content: string, root: Element):SelectInfo[] {
+export function relativeOffsetChat(content: string, root: Element): SelectInfo[] {
   let textNodes = getTextNodes(root);
   let length = 0;
   let hitContent = textNodes.map((item) => {
@@ -54,7 +54,7 @@ export function relativeOffset(ele: Text, root: Element): number {
   }
   return offset;
 }
-// /** 获取root元素下偏移量为offset的父节点*/
+/** 获取root元素下偏移量为offset的父节点*/
 export function relativeNode(root: Element, offset: number): null | Text {
   let node = null;
   let relativeOffset = 0;
