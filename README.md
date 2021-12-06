@@ -43,17 +43,17 @@ interface OPTS {
 配置说明：
 
 
-|参数名 |类型 |描述 |是否必须 |默认值 
-|---|---|---|---|---
-|el | Document | 标记的根节点元素 | 是 | null
-|options | Object | 配置项(详细如下) | 否 | null
+| 参数名  | 类型     | 描述             | 是否必须 | 默认值 |
+| ------- | -------- | ---------------- | -------- | ------ |
+| el      | Document | 标记的根节点元素 | 是       | null   |
+| options | Object   | 配置项(详细如下) | 否       | null   |
 
 
 ``options``配置说明：
 
-|参数名|类型|描述|是否必须|默认值
-|---|---|---|---|---
-|isCover | Boolean | 标记内容是否可以覆盖 | 否 | true
+| 参数名  | 类型    | 描述                 | 是否必须 | 默认值 |
+| ------- | ------- | -------------------- | -------- | ------ |
+| isCover | Boolean | 标记内容是否可以覆盖 | 否       | true   |
 
 
 ### 实例方法
@@ -75,6 +75,13 @@ jsMark.onSelected = function (res:Selected) {};
 ##### 2.标注选中文本：``jsMark.repaintRange(nodes:Text[],uid:string,cssClass:string)``
 
 标注已经选中的文本，一般用在``jsMark.onSelected``回调方法内，接受三个参数
+标注文本节点默认提供四种dom attribute
+| 参数名        | 描述                                                             | 默认值               |
+| ------------- | ---------------------------------------------------------------- | -------------------- |
+| data-selector | 标注文本节点的唯一id，可用于清除当前标注节点                     | 手动传入/自动生成    |
+| data-index    | 当前文本节点在textNodes中的index，主要用于处理奇偶节点的不同逻辑 | textNodes所处的index |
+| data-start    | 当前文本节点在textNodes中是第一个，用于::before                  | 有/没有该属性        |
+| data-end      | 当前文本节点在textNodes中是最后一个，用于::after                 | 有/没有该属性        |
 ```js
 
 //定义
@@ -82,7 +89,12 @@ interface RangeNodes{
     textNodes: Text[]; //选中的所有文本节点,onSelected返回值的res.textNodes
     className: string; //需要标注的文本节点样式类
     uuid?: string; //标注文本节点的唯一id，会绑定到节点身上的data-selector属性，此id可用于清除当前标注节点，可选，不传会自动生成
+    attrs?: nodeAttr[]; //用于自定义的dom attribute绑定
     storeRenderOther?:any; //来自jsMark.renderStore方法的用户自定义参数
+}
+interface nodeAttr {
+    name: string; //dom attribute name
+    value: string; // dom attribute value
 }
 
 function repaintRange(opts:RangeNodes):void{...}
@@ -158,7 +170,7 @@ jsMark.destroyEvent();
 ## 兼容性
 
 
-|IE | Firefox| Chrome| Safari| Opera
-|---|---|---|---|---
-|10+ | 52+ |15+|5.1+|15+
+| IE  | Firefox | Chrome | Safari | Opera |
+| --- | ------- | ------ | ------ | ----- |
+| 10+ | 52+     | 15+    | 5.1+   | 15+   |
 

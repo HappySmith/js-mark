@@ -20,8 +20,8 @@ interface rangeNode {
     storeRenderOther?: any;
 }
 interface nodeAttr {
-    name: string;
-    value: string;
+    name: string; //dom attribute name
+    value: string; // dom attribute value
 }
 interface RangeNodes {
     textNodes: Text[]; //选中的所有文本节点

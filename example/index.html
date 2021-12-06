@@ -208,9 +208,11 @@
                 data.push(position);
                 localStorage.setItem("data", JSON.stringify(data));
             }
+
             function getLocal() {
                 return JSON.parse(localStorage.getItem("data")) || [];
             }
+
             function clearItemLocal(id) {
                 let data = getLocal();
                 data = data.filter((item) => item.uuid !== id);
@@ -229,9 +231,15 @@
             });
             //选中文本后回调
             jsMark.onSelected = function (res) {
+                console.log(res)
+                res.textNodes.forEach(item => console.log(item))
                 let uuid = jsMark.repaintRange({
                     textNodes: res.textNodes,
-                    className: cssStyle[cssIndex]
+                    className: cssStyle[cssIndex],
+                    attrs: [{
+                        name: 'data-text',
+                        value: `${res.text}`
+                    }]
                 });
                 ++cssIndex >= cssStyle.length ? (cssIndex = 0) : cssIndex;
                 if (!res.hasStoreRender) {
